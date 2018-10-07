@@ -29,10 +29,10 @@ class App extends Component {
             <label className='' htmlFor='columns'>Cols: </label>
             <input type='number' className='' id='columns' name='columns' value={this.state.columns} onChange={this.handleColumnsChange} disabled/>
           </div>
-          <div>
+          {/* <div>
             <label className='' htmlFor='rows'>Rows: </label>
             <input type='number' className='' id='rows' name='rows' value={this.state.rows} onChange={this.handleRowsChange} />
-          </div>
+          </div> */}
           <div>
             <label className='' htmlFor='defaultValue'>Default value: </label>
             <input type='number' min='2' step='2' className='' id='defaultValue' name='defaultValue' value={this.state.defaultValue} onChange={this.handleDefaultValueChange} />

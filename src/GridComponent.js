@@ -1,6 +1,7 @@
 import React from 'react';
 import './styles/GridComponent.css';
 import NodeComponent from './NodeComponent';
+import ExpandCollapseControl from './ExpandCollapseControl';
 
 function Node(value){
   this.value = value;
@@ -11,21 +12,29 @@ function Node(value){
 class GridComponent extends React.Component {
   constructor(props) {
     super(props);
-    this.handleRowClick = this.handleRowClick.bind(this);
+    this.handleExpandClick = this.handleExpandClick.bind(this);
+    this.handleCollapseClick = this.handleCollapseClick.bind(this);
     this.handleValueChange = this.handleValueChange.bind(this);
     this.preTraverse = this.preTraverse.bind(this);
     this.state = {
-      tree: new Node(this.props.defaultValue),
-      treeArray: []
+      tree: new Node(this.props.defaultValue)
     }
   }
 
-
-  handleRowClick(node) {
+  handleExpandClick(node) {
     node.left = new Node(node.value/2);
     node.right = new Node(node.value/2);
-    this.state.treeArray = [];
-    // this.setState({treeArray: []});
+    this.treeArray = [];
+    this.expandCollapseControlArray = [];
+    this.preTraverse(this.state.tree);
+    this.forceUpdate();
+  }
+
+  handleCollapseClick(node) {
+    node.left = null;
+    node.right = null;
+    this.treeArray = [];
+    this.expandCollapseControlArray = [];
     this.preTraverse(this.state.tree);
     this.forceUpdate();
   }
@@ -35,7 +44,8 @@ class GridComponent extends React.Component {
       node.value = event.target.value;
       siblingNode.value = parentNode.value - node.value;
     }
-    this.state.treeArray = [];
+    this.treeArray = [];
+    this.expandCollapseControlArray = [];
     this.preTraverse(this.state.tree);
     this.forceUpdate();
   }
@@ -46,28 +56,19 @@ class GridComponent extends React.Component {
     if(!node){
       return;
     }
-    // this.setState(prevState => (
-    //   {
-    //     treeArray: [
-    //       ...prevState.treeArray,
-    //       <div
-    //         key={prevState.treeArray.length}
-    //         className='grid-item'
-    //         /* onClick={()=>this.handleRowClick(node)} */
-    //         onClick={(!node.left && !node.right && node.value > 1) ? ()=>this.handleRowClick(node) : null}
-    //       >
-    //         {node.value}
-    //       </div>
-    //     ]
-    //   }
-    // ));
-    this.state.treeArray.push(
+    this.treeArray.push(
       <NodeComponent
-        key={this.state.treeArray.length}
+        key={this.treeArray.length}
         className='grid-item'
-        onClick={(!node.left && !node.right && node.value > 1) ? ()=>this.handleRowClick(node) : null}
         onChange={(!node.left && !node.right && parentNode && siblingNode && node.value > 1) ? (event)=>this.handleValueChange(event, node, parentNode, siblingNode) : null}
         value={node.value}
+      />
+    );
+    this.expandCollapseControlArray.push(
+      <ExpandCollapseControl
+        key={this.expandCollapseControlArray.length}
+        expand={(!node.left && !node.right && node.value > 1) ? ()=>this.handleExpandClick(node) : null}
+        collapse={(node.left && node.right) ? ()=>this.handleExpandClick(node) : null}
       />
     );
     this.preTraverse(node.left, node, node.right);
@@ -77,8 +78,8 @@ class GridComponent extends React.Component {
 
   componentDidMount(){
     console.log('componentDidMount');
-    // this.setState({treeArray: []});
-    this.state.treeArray = [];
+    this.treeArray = [];
+    this.expandCollapseControlArray = [];
     this.preTraverse(this.state.tree);
     this.forceUpdate();
 
@@ -87,22 +88,27 @@ class GridComponent extends React.Component {
   render() {
     console.log('render');
     console.log(this.state.tree);
-    console.log(this.state.treeArray);
+    console.log(this.treeArray);
 
     // const gridItems = [];
     /* for (let i=0; i<this.props.rows; i++) {
       for (let j=0; j<this.props.columns; j++) {
-        gridItems.push(<div key={i} className='grid-item' onClick={()=>this.handleRowClick(i)} >{this.props.defaultValue}</div>)
+        gridItems.push(<div key={i} className='grid-item' onClick={()=>this.handleExpandClick(i)} >{this.props.defaultValue}</div>)
       }
     } */
     // let node = this.state.tree;
     // while(node.value){
-    //   gridItems.push(<div key={i} className='grid-item' onClick={()=>this.handleRowClick(node)} >{this.props.value}</div>)
+    //   gridItems.push(<div key={i} className='grid-item' onClick={()=>this.handleExpandClick(node)} >{this.props.value}</div>)
     // }
 
     return (
       <div className='grid-container'>
-        {this.state.treeArray}
+        <div className='grid-item'>
+          {this.expandCollapseControlArray}
+        </div>
+        <div className='grid-item'>
+          {this.treeArray}
+        </div>
       </div>
     );
   }
