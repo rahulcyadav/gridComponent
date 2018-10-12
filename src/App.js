@@ -26,7 +26,7 @@ class App extends Component {
         <h2>Grid Component</h2>
         <form>
           <div>
-            <label className='' htmlFor='columns'>Cols: </label>
+            <label className='' htmlFor='columns'>Columns: </label>
             <input type='number' className='' id='columns' name='columns' value={this.state.columns} onChange={this.handleColumnsChange} />
           </div>
           <div>

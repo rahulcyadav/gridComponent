@@ -15,13 +15,13 @@ class GridComponent extends React.Component {
     this.handleExpandClick = this.handleExpandClick.bind(this);
     this.handleCollapseClick = this.handleCollapseClick.bind(this);
     this.handleValueChange = this.handleValueChange.bind(this);
-    let treeGrid = [];
+    let grid = [];
     for(let i = 0; i < this.props.columns; i++){
-      treeGrid.push(new Node(this.props.defaultValue));
+      grid.push(new Node(this.props.defaultValue));
     }
 
     this.state = {
-      tree: new Node(this.props.defaultValue),
+      grid: grid,
     }
   }
 
@@ -30,6 +30,7 @@ class GridComponent extends React.Component {
     node.left = new Node(node.value/2);
     node.right = new Node(node.value/2);
     this.forceUpdate();
+    console.log('handleExpandClick:', node)
   }
   // minus button click handler to collapse the tree node
   handleCollapseClick(node) {
@@ -48,56 +49,70 @@ class GridComponent extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.defaultValue !== state.tree.value) {
+    // if (props.defaultValue !== state.grid[0].value) {
+      let grid = [];
+      for(let i = 0; i < props.columns; i++){
+        grid.push(new Node(props.defaultValue));
+      }
       return {
-        tree: new Node(props.defaultValue)
+        grid: grid
       };
-    }
-    return null;
+    // }
+    // return null;
   }
 
   render() {
     console.log('render');
-    console.log(this.state.tree);
-    const treeArray = [];
+    console.log(this.state.grid);
+    const gridArray = [];
+    this.state.grid.forEach(tree=>{
+      gridArray.push([]);
+    })
     const expandCollapseControlArray = [];
+
     // function for pre-order traversal of the tree and population of the tree array to show on screen
-    function preTraverse(node, parentNode, siblingNode){
+    function preTraverse(index, node, parentNode, siblingNode){
       console.log('preTraverse');
       if(!node){
         return;
       }
-      treeArray.push(
-        <NodeComponent
-          key={treeArray.length}
+      gridArray[index].push({
+        nodeComponent: (<NodeComponent
+          key={gridArray[index].length}
           className='grid-item'
           onChange={(!node.left && !node.right && parentNode && siblingNode && !siblingNode.left && !siblingNode.right)
-                    ? (event)=>this.handleValueChange(event, node, parentNode, siblingNode)
-                    : null
+                    && ( (event) => ( this.handleValueChange(event, node, parentNode, siblingNode) ) )
                   }
           value={node.value}
-        />
-      );
-      expandCollapseControlArray.push(
-        <ExpandCollapseControl
+        />),
+        nodeRef: node
+
+      });
+
+      if(index===0){
+        expandCollapseControlArray.push(
+          <ExpandCollapseControl
           key={expandCollapseControlArray.length}
-          expand={(!node.left && !node.right && node.value > 1) ? ()=>this.handleExpandClick(node) : null}
-          collapse={(node.left && node.right) ? ()=>this.handleCollapseClick(node) : null}
-        />
-      );
-      preTraverse.call(this, node.left, node, node.right);
-      preTraverse.call(this, node.right, node, node.left);
+          expand={ ( !node.left && !node.right && node.value > 1 ) && ( ()=>this.handleExpandClick(node) ) }
+          collapse={ ( node.left && node.right ) && ( ()=>this.handleCollapseClick(node) ) }
+          />
+        );
+      }
+
+      preTraverse.call(this, index, node.left, node, node.right);
+      preTraverse.call(this, index, node.right, node, node.left);
     }
-    preTraverse.call(this, this.state.tree);
+
+    this.state.grid.forEach((tree, index)=>{
+      preTraverse.call(this, index, tree);
+    })
 
     return (
-      <div className='grid-container' /* style={{gridTemplateColumns: `10% repeat(${this.props.columns} auto)`}} */>
+      <div className='grid-container' style={{gridTemplateColumns: `10% repeat(${this.props.columns}, auto)`}}>
         <div className='grid-item'>
           {expandCollapseControlArray}
         </div>
-        <div className='grid-item'>
-          {treeArray}
-        </div>
+        {gridArray.map( (tree, index) => (<div className='grid-item' key={`grid-item-${index}`} >{tree.map(node=>node.nodeComponent)}</div>) )}
       </div>
     );
   }
