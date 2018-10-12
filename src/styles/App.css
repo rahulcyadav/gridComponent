@@ -5,3 +5,10 @@ label{
 form{
     margin-bottom: 8px;
 }
+input, button{
+    padding: 4px;
+    margin: 4px;
+    min-width: 40px;
+    max-width: 80px;
+    text-align: center;
+}

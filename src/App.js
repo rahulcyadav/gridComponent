@@ -27,15 +27,15 @@ class App extends Component {
         <form>
           <div>
             <label className='' htmlFor='columns'>Cols: </label>
-            <input type='number' className='' id='columns' name='columns' value={this.state.columns} onChange={this.handleColumnsChange} disabled/>
+            <input type='number' className='' id='columns' name='columns' value={this.state.columns} onChange={this.handleColumnsChange} />
           </div>
           <div>
             <label className='' htmlFor='rows'>Rows: </label>
-            <input type='number' className='' id='rows' name='rows' value={this.state.rows} onChange={this.handleRowsChange} disabled/>
+            <input type='number' className='' id='rows' name='rows' value={this.state.rows} onChange={this.handleRowsChange} />
           </div>
           <div>
             <label className='' htmlFor='defaultValue'>Default value: </label>
-            <input type='number' min='2' step='2' className='' id='defaultValue' name='defaultValue' value={this.state.defaultValue} onChange={this.handleDefaultValueChange} disabled/>
+            <input type='number' min='2' step='2' className='' id='defaultValue' name='defaultValue' value={this.state.defaultValue} onChange={this.handleDefaultValueChange} />
           </div>
         </form>
         <GridComponent columns={this.state.columns} rows={this.state.rows} defaultValue={this.state.defaultValue} />
